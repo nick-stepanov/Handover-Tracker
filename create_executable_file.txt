@@ -1,0 +1,8 @@
+ Navigate to your project's root directory (if not already there)
+cd path\to\your\project\root
+
+# Create the executable_files folder
+mkdir executable_files
+
+# Run PyInstaller with the specified output directory
+pyinstaller --onefile --windowed --distpath .\executable_files --workpath .\executable_files\build --specpath .\executable_files --add-data "File_Processing;File_Processing" --add-data "File_Checking;File_Checking" Handover_checklist_UI\gui_dashboard.py
