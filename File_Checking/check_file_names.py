@@ -1,15 +1,6 @@
 import json
-import pandas as pd
-import re
+import argparse
 
-# Load the file list from JSON
-with open('file_list.json', 'r') as f:
-    file_list = json.load(f)
-
-# Convert the list of dictionaries to a DataFrame
-df = pd.DataFrame(file_list)
-
-# Define categories and associated keywords
 categories = {
     "Building Control": ["building control", "buildingcontrol"],
     "Fire Strategy": ["fire strategy", "firestrategy"],
@@ -45,49 +36,42 @@ categories = {
     "Extra item(s) - EPC": ["epc"]
 }
 
-# Initialize dictionary to store files for each category
-categorized_files = {cat: [] for cat in categories}
-
-# Categorize files
-for _, row in df.iterrows():
-    file_name = row['file_name'].lower()
-    file_path = row['file_path'].lower()
+def categorize_files(file_list):
+    categorized_files = {cat: [] for cat in categories}
     
-    for category, keywords in categories.items():
-        if any(keyword in file_name in file_path for keyword in keywords):
-            categorized_files[category].append(row['file_path'])
+    for file_info in file_list:
+        file_name = file_info['file_name'].lower()
+        file_path = file_info['file_path'].lower()
+        
+        for category, keywords in categories.items():
+            if any(keyword in file_name or keyword in file_path for keyword in keywords):
+                categorized_files[category].append(file_info['file_path'])
+    
+    return categorized_files
 
-# Create a summary DataFrame
-summary_data = []
-for category, files in categorized_files.items():
-    summary_data.append({
-        "Category": category,
-        "Files Found": len(files),
-        "Files": ", ".join(files) if files else "No files found"
-    })
+def main():
+    parser = argparse.ArgumentParser(description="Categorize files based on predefined keywords.")
+    parser.add_argument("input_file", help="Path to the input JSON file (file_list.json)")
+    parser.add_argument("output_file", help="Path to the output JSON file (handover_checklist_summary.json)")
+    args = parser.parse_args()
 
-summary_df = pd.DataFrame(summary_data)
+    with open(args.input_file, 'r') as f:
+        file_list = json.load(f)
 
-# Display summary
-print(summary_df[["Category", "Files Found"]])
+    categorized_files = categorize_files(file_list)
 
-# Save detailed results to JSON
-json_file_path = "handover_checklist_summary.json"
-with open(json_file_path, 'w', encoding='utf-8') as json_file:
-    json.dump(summary_data, json_file, indent=2, ensure_ascii=False)
-print(f"Detailed summary saved to '{json_file_path}'")
+    summary_data = []
+    for category, files in categorized_files.items():
+        summary_data.append({
+            "Category": category,
+            "Files Found": len(files),
+            "Files": ", ".join(files) if files else "No files found"
+        })
 
-# Save detailed results to CSV
-summary_df.to_csv("handover_checklist_summary.csv", index=False)
-print("\nDetailed summary saved to 'handover_checklist_summary.csv'")
+    with open(args.output_file, 'w') as f:
+        json.dump(summary_data, f, indent=2)
 
+    print(f"Categorized file summary has been saved to {args.output_file}")
 
-
-# Identify missing categories
-missing_categories = summary_df[summary_df["Files Found"] == 0]["Category"].tolist()
-if missing_categories:
-    print("\nWarning: No files found for these categories:")
-    for cat in missing_categories:
-        print(f"- {cat}")
-else:
-    print("\nAll categories have at least one file.")
+if __name__ == "__main__":
+    main()
