@@ -9,7 +9,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import functions from other scripts using the correct relative paths
-from File_Processing.get_all_files_register import get_all_files
+from File_Processing.Get_all_files_register import get_all_files
 from File_Checking.check_file_names import categorize_files
 
 # Global variable to store the current directory
