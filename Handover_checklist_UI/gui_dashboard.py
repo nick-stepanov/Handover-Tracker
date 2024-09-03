@@ -92,10 +92,25 @@ class HandoverChecklist(tk.Tk):
         self.tree.tag_configure('file', background='white')
 
     def on_double_click(self, event):
-        item = self.tree.selection()[0]
-        if self.tree.item(item, "tags")[0] == 'file':
-            file_path = self.tree.item(item, "values")[1]
-            self.open_file(file_path)
+        item = self.tree.identify('item', event.x, event.y)
+        if not item:
+            return  # Clicked on empty space
+
+        values = self.tree.item(item, 'values')
+        tags = self.tree.item(item, 'tags')
+
+        if 'category' in tags:
+            # Clicked on a category row, do nothing or toggle expand/collapse
+            return
+
+        if 'file' in tags and len(values) >= 3:
+            file_path = values[2]  # Full path should be in the third column
+            if os.path.exists(file_path):
+                self.open_file(file_path)
+            else:
+                messagebox.showerror("Error", f"File not found: {file_path}")
+        else:
+            messagebox.showerror("Error", "Invalid file selection")
 
     def open_file(self, file_path):
         try:
