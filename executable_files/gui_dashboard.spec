@@ -2,10 +2,10 @@
 
 
 a = Analysis(
-    ['Handover_checklist_UI\\gui_dashboard.py'],
+    ['..\\Handover_checklist_UI\\gui_dashboard.py'],
     pathex=[],
     binaries=[],
-    datas=[('File_Processing', 'File_Processing'), ('File_Checking', 'File_Checking')],
+    datas=[('C:\\Users\\Nick.Stepanov\\OneDrive - OTAK INC\\Documents\\GitHub\\Handover-Tracker\\File_Processing', 'File_Processing'), ('C:\\Users\\Nick.Stepanov\\OneDrive - OTAK INC\\Documents\\GitHub\\Handover-Tracker\\File_Checking', 'File_Checking')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
