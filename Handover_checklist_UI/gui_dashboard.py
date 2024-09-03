@@ -40,17 +40,24 @@ class HandoverChecklist(tk.Tk):
         self.excel_button.pack(pady=5)
 
         # Table
-        self.tree = ttk.Treeview(self, columns=("Category", "File"), show="tree headings")
+        self.tree = ttk.Treeview(self, columns=("Category", "File Name", "Full Path"), show="tree headings")
         self.tree.heading("Category", text="Category")
-        self.tree.heading("File", text="File")
+        self.tree.heading("File Name", text="File Name")
+        self.tree.heading("Full Path", text="Full Path")
         self.tree.column("Category", width=200)
-        self.tree.column("File", width=750)
+        self.tree.column("File Name", width=300)
+        self.tree.column("Full Path", width=500)
         self.tree.pack(fill=tk.BOTH, expand=1)
 
-        # Scrollbar
+        # Vertical Scrollbar
         scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.tree.yview)
         self.tree.configure(yscroll=scrollbar.set)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        # Horizontal Scrollbar
+        h_scrollbar = ttk.Scrollbar(self, orient=tk.HORIZONTAL, command=self.tree.xview)
+        h_scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
+        self.tree.configure(xscroll=h_scrollbar.set)
 
         # Bind double-click event
         self.tree.bind("<Double-1>", self.on_double_click)
@@ -77,7 +84,8 @@ class HandoverChecklist(tk.Tk):
         for category, files in data.items():
             category_id = self.tree.insert("", tk.END, text=category, values=(category, f"{len(files)} files found"), tags=('category',))
             for file in files:
-                self.tree.insert(category_id, tk.END, values=(category, file), tags=('file',))
+                file_name = os.path.basename(file)
+                self.tree.insert(category_id, tk.END, values=(category, file_name, file), tags=('file',))
         
         # Configure tag colors
         self.tree.tag_configure('category', background='lightgrey')
